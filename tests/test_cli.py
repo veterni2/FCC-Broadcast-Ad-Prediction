@@ -30,3 +30,32 @@ def test_run_help() -> None:
     assert "--operators" in result.output
     assert "--year" in result.output
     assert "--update" in result.output
+
+
+def test_crawl_help() -> None:
+    """crawl --help shows operator and year options."""
+    result = runner.invoke(app, ["crawl", "--help"])
+    assert result.exit_code == 0
+    assert "--operators" in result.output
+    assert "--year" in result.output
+
+
+def test_download_help() -> None:
+    """download --help shows limit option."""
+    result = runner.invoke(app, ["download", "--help"])
+    assert result.exit_code == 0
+    assert "--limit" in result.output
+
+
+def test_model_help() -> None:
+    """model --help shows output option."""
+    result = runner.invoke(app, ["model", "--help"])
+    assert result.exit_code == 0
+    assert "--output" in result.output
+
+
+def test_validate_help() -> None:
+    """validate --help shows year option."""
+    result = runner.invoke(app, ["validate", "--help"])
+    assert result.exit_code == 0
+    assert "--year" in result.output

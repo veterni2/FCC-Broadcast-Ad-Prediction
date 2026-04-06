@@ -1,7 +1,9 @@
 """Anthropic API client wrapper for structured document extraction.
 
-Uses Claude's structured outputs (output_config with json_schema)
-to guarantee schema-compliant extraction results via Pydantic models.
+Uses Claude's tool use (tool_choice forced) to guarantee schema-compliant
+extraction results via Pydantic models. Forcing a named tool guarantees the
+response contains a tool_use block — stop_reason will be "tool_use" rather
+than "end_turn" — so the model cannot return free-form text instead of JSON.
 
 Cost tracking is built in — each call logs input/output tokens
 and estimated USD cost. The extractor enforces a per-run budget.
@@ -25,6 +27,14 @@ _INPUT_COST_PER_MTOK = 3.00
 _OUTPUT_COST_PER_MTOK = 15.00
 
 
+def _build_tool_schema(model_class) -> dict:
+    """Build Anthropic tool input_schema from a Pydantic model."""
+    schema = model_class.model_json_schema()
+    # Remove Pydantic-specific top-level keys that Anthropic doesn't need
+    schema.pop("title", None)
+    return schema
+
+
 class LLMClient:
     """Anthropic Claude client for political ad document extraction.
 
@@ -45,6 +55,8 @@ class LLMClient:
         self._total_output_tokens = 0
         self._total_cost = 0.0
         self._call_count = 0
+        # Precompute tool schema once from the Pydantic model
+        self._tool_schema = _build_tool_schema(PoliticalAdExtraction)
 
     def extract(self, document_text: str) -> tuple[PoliticalAdExtraction, dict]:
         """Extract structured data from a political ad document.
@@ -64,19 +76,38 @@ class LLMClient:
             )
             document_text = document_text[:max_chars]
 
+        tool_spec = {
+            "name": "extract_political_ad_data",
+            "description": (
+                "Extract structured political advertising data from the document text. "
+                "Return exactly the fields you can identify with confidence. "
+                "Set fields to null when information is absent or ambiguous."
+            ),
+            "input_schema": self._tool_schema,
+        }
+
         response = self._client.messages.create(
             model=self._model,
             max_tokens=self._max_tokens,
             temperature=self._temperature,
             system=EXTRACTION_SYSTEM_PROMPT,
-            messages=[
-                {"role": "user", "content": document_text},
-            ],
+            tools=[tool_spec],
+            tool_choice={"type": "tool", "name": "extract_political_ad_data"},
+            messages=[{"role": "user", "content": document_text}],
         )
 
-        # Parse the response
-        response_text = response.content[0].text
-        result = PoliticalAdExtraction.model_validate_json(response_text)
+        # tool_choice forces a tool_use block; stop_reason will be "tool_use"
+        # rather than "end_turn". Extract the tool use result block.
+        tool_use_block = next(
+            (b for b in response.content if b.type == "tool_use"),
+            None,
+        )
+        if tool_use_block is None:
+            raise ValueError(
+                f"No tool_use block in response. Content types: "
+                f"{[b.type for b in response.content]}"
+            )
+        result = PoliticalAdExtraction.model_validate(tool_use_block.input)
 
         # Track costs
         input_tokens = response.usage.input_tokens
