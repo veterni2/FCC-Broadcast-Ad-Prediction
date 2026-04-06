@@ -37,7 +37,7 @@ console = Console()
 
 
 # ---------------------------------------------------------------------------
-# Shared options
+# Shared helpers
 # ---------------------------------------------------------------------------
 
 def _validate_operators(operators: list[str]) -> list[str]:
@@ -50,6 +50,11 @@ def _validate_operators(operators: list[str]) -> list[str]:
                 f"Known operators: {', '.join(known)}[/yellow]"
             )
     return [op.lower() for op in operators]
+
+
+def _run_async(coro):  # type: ignore[no-untyped-def]
+    """Run an async coroutine from a synchronous Typer command."""
+    return asyncio.run(coro)
 
 
 # ---------------------------------------------------------------------------
@@ -89,13 +94,13 @@ def run(
     ),
 ) -> None:
     """Run the full pipeline: crawl -> download -> extract -> model."""
-    log = setup_logging(verbose=verbose)
+    setup_logging(verbose=verbose)
     operators = _validate_operators(operators)
 
     db = DatabaseManager()
     db.initialize()
 
-    console.print(f"\n[bold green]FCC Political Ad Tracker[/bold green]")
+    console.print(f"\n[bold green]FCC Political Ad Tracker — Full Pipeline[/bold green]")
     console.print(f"Operators: {', '.join(operators)}")
     console.print(f"Year: {year}")
     console.print(f"Mode: {'incremental' if update else 'full'}")
@@ -105,13 +110,92 @@ def run(
         console.print(f"Document limit: {limit}")
     if dry_run:
         console.print("[yellow]DRY RUN — no changes will be made[/yellow]")
+        return
 
-    console.print("\n[dim]Pipeline stages:[/dim]")
-    console.print("  1. Station enumeration — [yellow]not yet implemented[/yellow]")
-    console.print("  2. Political file crawl — [yellow]not yet implemented[/yellow]")
-    console.print("  3. PDF download + OCR — [yellow]not yet implemented[/yellow]")
-    console.print("  4. LLM extraction — [yellow]not yet implemented[/yellow]")
-    console.print("  5. Financial model — [yellow]not yet implemented[/yellow]")
+    # Stage 1: Station enumeration
+    from .stage1_stations.enumerator import enumerate_stations
+    console.print("\n[cyan]Stage 1:[/cyan] Enumerating stations...")
+    stations = enumerate_stations(db=db, operators=operators, top_dma=top_dma)
+    console.print(f"  [green]✓[/green] {len(stations)} stations registered")
+
+    if not stations:
+        console.print("[red]No stations found — aborting.[/red]")
+        raise typer.Exit(1)
+
+    # Stage 2: Crawl
+    from .stage2_crawler.crawler import crawl_stations
+    console.print("\n[cyan]Stage 2:[/cyan] Crawling FCC OPIF...")
+    crawl_stats = _run_async(
+        crawl_stations(
+            db=db,
+            stations=stations,
+            year=year,
+            operators_str=", ".join(operators),
+            incremental=update,
+        )
+    )
+    console.print(
+        f"  [green]✓[/green] {crawl_stats['new_docs']} new docs, "
+        f"{crawl_stats['skipped_existing']} existing, "
+        f"{crawl_stats['errors']} errors"
+    )
+
+    # Stage 3a: Download PDFs
+    from .stage3_pdf.downloader import download_documents
+    console.print("\n[cyan]Stage 3a:[/cyan] Downloading PDFs...")
+    dl_stats = _run_async(
+        download_documents(
+            db=db,
+            operator=operators[0] if len(operators) == 1 else None,
+            year=year,
+            limit=limit,
+        )
+    )
+    console.print(
+        f"  [green]✓[/green] {dl_stats['downloaded']} downloaded, "
+        f"{dl_stats['skipped']} skipped, "
+        f"{dl_stats['failed']} failed"
+    )
+
+    # Stage 3b: Text extraction (PDF/OCR)
+    from .stage3_pdf.pipeline import run_pdf_pipeline
+    console.print("\n[cyan]Stage 3b:[/cyan] Extracting text from PDFs...")
+    ocr_stats = _run_async(
+        run_pdf_pipeline(
+            db=db,
+            operator=operators[0] if len(operators) == 1 else None,
+            year=year,
+            limit=limit,
+        )
+    )
+    console.print(
+        f"  [green]✓[/green] {ocr_stats['success']} extracted "
+        f"({ocr_stats['ocr_used']} via OCR), {ocr_stats['failed']} failed"
+    )
+
+    # Stage 4: LLM extraction
+    from .stage4_llm.extractor import run_llm_extraction
+    console.print("\n[cyan]Stage 4:[/cyan] LLM extraction...")
+    llm_stats = _run_async(
+        run_llm_extraction(
+            db=db,
+            operator=operators[0] if len(operators) == 1 else None,
+            year=year,
+            limit=limit,
+        )
+    )
+    console.print(
+        f"  [green]✓[/green] {llm_stats.get('success', 0)} extracted, "
+        f"{llm_stats.get('failed', 0)} failed, "
+        f"${llm_stats.get('total_cost_usd', 0.0):.2f} API cost"
+    )
+
+    # Stage 5: Financial model
+    console.print("\n[cyan]Stage 5:[/cyan] Building financial model...")
+    console.print("  [yellow]Stage 5 model not yet implemented.[/yellow]")
+
+    console.print("\n[bold green]Pipeline complete.[/bold green]")
+    _print_status(db)
 
 
 @app.command()
@@ -138,14 +222,41 @@ def crawl(
     ),
 ) -> None:
     """Stage 2: Discover political ad documents on FCC OPIF."""
-    log = setup_logging(verbose=verbose)
+    setup_logging(verbose=verbose)
     operators = _validate_operators(operators)
 
     db = DatabaseManager()
     db.initialize()
 
-    console.print(f"\n[bold]Crawling FCC OPIF for {', '.join(operators)} — {year}[/bold]")
-    console.print("[yellow]Stage 2 crawler not yet implemented.[/yellow]")
+    # Stage 1: enumerate stations first
+    from .stage1_stations.enumerator import enumerate_stations
+    stations = enumerate_stations(db=db, operators=operators, top_dma=top_dma)
+
+    if not stations:
+        console.print("[red]No stations found — check operator_stations.csv.[/red]")
+        raise typer.Exit(1)
+
+    console.print(
+        f"\n[bold]Crawling FCC OPIF for {', '.join(operators)} — {year}[/bold]"
+    )
+    console.print(f"Stations: {len(stations)} | Mode: {'incremental' if update else 'full'}")
+
+    from .stage2_crawler.crawler import crawl_stations
+    stats = _run_async(
+        crawl_stations(
+            db=db,
+            stations=stations,
+            year=year,
+            operators_str=", ".join(operators),
+            incremental=update,
+        )
+    )
+
+    console.print(f"\n[green]Crawl complete:[/green]")
+    console.print(f"  New documents:      {stats['new_docs']}")
+    console.print(f"  Already known:      {stats['skipped_existing']}")
+    console.print(f"  Station errors:     {stats['errors']}")
+    console.print(f"  Stations crawled:   {stats['total_stations']}")
 
 
 @app.command()
@@ -168,14 +279,31 @@ def download(
     ),
 ) -> None:
     """Stage 3a: Download PDFs for discovered documents."""
-    log = setup_logging(verbose=verbose)
+    setup_logging(verbose=verbose)
     operators = _validate_operators(operators)
 
     db = DatabaseManager()
     db.initialize()
 
-    console.print(f"\n[bold]Downloading PDFs for {', '.join(operators)}[/bold]")
-    console.print("[yellow]Stage 3 downloader not yet implemented.[/yellow]")
+    console.print(
+        f"\n[bold]Downloading PDFs for {', '.join(operators)}"
+        + (f" — {year}" if year else "") + "[/bold]"
+    )
+
+    from .stage3_pdf.downloader import download_documents
+    stats = _run_async(
+        download_documents(
+            db=db,
+            operator=operators[0] if len(operators) == 1 else None,
+            year=year,
+            limit=limit,
+        )
+    )
+
+    console.print(f"\n[green]Download complete:[/green]")
+    console.print(f"  Downloaded:  {stats['downloaded']}")
+    console.print(f"  Skipped:     {stats['skipped']}")
+    console.print(f"  Failed:      {stats['failed']}")
 
 
 @app.command()
@@ -202,14 +330,49 @@ def extract(
     ),
 ) -> None:
     """Stages 3b+4: Text extraction (OCR) then LLM structured extraction."""
-    log = setup_logging(verbose=verbose)
+    setup_logging(verbose=verbose)
     operators = _validate_operators(operators)
 
     db = DatabaseManager()
     db.initialize()
 
-    console.print(f"\n[bold]Extracting data for {', '.join(operators)}[/bold]")
-    console.print("[yellow]Stages 3-4 extraction not yet implemented.[/yellow]")
+    console.print(
+        f"\n[bold]Extracting data for {', '.join(operators)}"
+        + (f" — {year}" if year else "") + "[/bold]"
+    )
+
+    # Stage 3b: PDF text extraction
+    from .stage3_pdf.pipeline import run_pdf_pipeline
+    console.print("[cyan]Stage 3b:[/cyan] PDF text extraction...")
+    pdf_stats = _run_async(
+        run_pdf_pipeline(
+            db=db,
+            operator=operators[0] if len(operators) == 1 else None,
+            year=year,
+            limit=limit,
+        )
+    )
+    console.print(
+        f"  {pdf_stats['success']} extracted ({pdf_stats['ocr_used']} via OCR), "
+        f"{pdf_stats['failed']} failed"
+    )
+
+    # Stage 4: LLM extraction
+    from .stage4_llm.extractor import run_llm_extraction
+    console.print("[cyan]Stage 4:[/cyan] LLM extraction...")
+    llm_stats = _run_async(
+        run_llm_extraction(
+            db=db,
+            operator=operators[0] if len(operators) == 1 else None,
+            year=year,
+            limit=limit,
+        )
+    )
+    console.print(
+        f"  {llm_stats.get('success', 0)} extracted, "
+        f"{llm_stats.get('failed', 0)} failed, "
+        f"${llm_stats.get('total_cost_usd', 0.0):.4f} API cost"
+    )
 
 
 @app.command()
@@ -232,14 +395,18 @@ def model(
     ),
 ) -> None:
     """Stage 5: Build financial model from extracted data."""
-    log = setup_logging(verbose=verbose)
+    setup_logging(verbose=verbose)
     operators = _validate_operators(operators)
 
     db = DatabaseManager()
     db.initialize()
 
-    console.print(f"\n[bold]Building financial model for {', '.join(operators)}[/bold]")
+    console.print(
+        f"\n[bold]Building financial model for {', '.join(operators)}"
+        + (f" — {year}" if year else "") + "[/bold]"
+    )
     console.print("[yellow]Stage 5 model not yet implemented.[/yellow]")
+    console.print("[dim]Run the full pipeline first with 'fcc-tracker run'.[/dim]")
 
 
 @app.command()
@@ -255,11 +422,20 @@ def status(
     db = DatabaseManager()
     try:
         db.initialize()
-        stats = db.get_pipeline_status()
     except Exception as e:
         console.print(f"[red]Database error: {e}[/red]")
-        console.print("[dim]Run a pipeline command first to initialize the database.[/dim]")
         raise typer.Exit(1)
+
+    _print_status(db)
+
+
+def _print_status(db: DatabaseManager) -> None:
+    """Print the pipeline status table."""
+    try:
+        stats = db.get_pipeline_status()
+    except Exception as e:
+        console.print(f"[red]Failed to read pipeline status: {e}[/red]")
+        return
 
     console.print("\n[bold green]FCC Political Ad Tracker — Pipeline Status[/bold green]\n")
 
@@ -275,13 +451,15 @@ def status(
     table.add_row("LLM", "LLM processed", str(stats["llm_processed"]))
     table.add_row("", "— Successful", str(stats["extraction_success"]))
     table.add_row("", "— Failed", str(stats["extraction_failed"]))
-    table.add_row("Cost", "Total API cost", f"${stats['total_cost_usd']:.2f}")
+    table.add_row("Cost", "Total API cost", f"${stats['total_cost_usd']:.4f}")
 
     console.print(table)
 
     if stats["total_documents"] > 0:
         coverage = stats["extraction_success"] / stats["total_documents"] * 100
-        console.print(f"\n[dim]Coverage rate: {coverage:.1f}% of discovered documents[/dim]")
+        console.print(
+            f"\n[dim]Coverage rate: {coverage:.1f}% of discovered documents[/dim]"
+        )
 
 
 @app.command()
@@ -303,9 +481,44 @@ def validate(
     setup_logging(verbose=verbose)
     operators = _validate_operators(operators)
 
+    db = DatabaseManager()
+    db.initialize()
+
     console.print(f"\n[bold]Validating {', '.join(operators)} — {year}[/bold]")
-    console.print("[yellow]Validation not yet implemented.[/yellow]")
-    console.print("[dim]Requires extracted data and known actuals from 10-K filings.[/dim]")
+
+    for operator in operators:
+        extractions = db.get_extractions_for_model(
+            operator=operator,
+            year=year,
+            document_type="INVOICE",
+        )
+
+        if not extractions:
+            console.print(
+                f"[yellow]{operator}:[/yellow] No invoice extractions found for {year}."
+            )
+            continue
+
+        total_gross = sum(
+            e.get("gross_amount") or 0.0
+            for e in extractions
+            if e.get("gross_amount") is not None
+        )
+        total_net = sum(
+            e.get("net_amount") or 0.0
+            for e in extractions
+            if e.get("net_amount") is not None
+        )
+
+        console.print(
+            f"\n[bold]{operator.title()}[/bold] — {year} Invoice Extractions"
+        )
+        console.print(f"  Docs with successful extraction: {len(extractions)}")
+        console.print(f"  Total gross amount:  ${total_gross:,.0f}")
+        console.print(f"  Total net amount:    ${total_net:,.0f}")
+        console.print(
+            "[dim]Compare to 10-K reported political ad revenue to assess coverage.[/dim]"
+        )
 
 
 if __name__ == "__main__":

@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS documents (
     race_level          TEXT,
     office_type         TEXT,
     candidate_name      TEXT,
+    document_type       TEXT,   -- 'INVOICE' | 'CONTRACT' | NULL (from URL path)
     campaign_year       INTEGER,
     political_file_type TEXT DEFAULT 'PA',
     file_name           TEXT,
@@ -175,6 +176,10 @@ class DatabaseManager:
         conn = self._connect()
         try:
             conn.executescript(_SCHEMA_SQL)
+            # Migration: add document_type column if it was not in the original schema
+            cols = {row[1] for row in conn.execute("PRAGMA table_info(documents)").fetchall()}
+            if "document_type" not in cols:
+                conn.execute("ALTER TABLE documents ADD COLUMN document_type TEXT")
             conn.commit()
         finally:
             conn.close()
@@ -281,9 +286,9 @@ class DatabaseManager:
                     doc_uuid, folder_uuid, folder_id, file_manager_id,
                     callsign, operator_name, dma_name, dma_rank,
                     year, race_level, office_type, candidate_name,
-                    campaign_year, political_file_type, file_name,
+                    document_type, campaign_year, political_file_type, file_name,
                     file_extension, file_size, create_ts, last_update_ts
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     doc["doc_uuid"],
@@ -298,6 +303,7 @@ class DatabaseManager:
                     doc.get("race_level"),
                     doc.get("office_type"),
                     doc.get("candidate_name"),
+                    doc.get("document_type"),  # INVOICE | CONTRACT from URL path
                     doc.get("campaign_year"),
                     doc.get("political_file_type", "PA"),
                     doc.get("file_name"),
