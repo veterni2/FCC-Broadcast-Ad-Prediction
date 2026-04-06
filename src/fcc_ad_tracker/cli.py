@@ -191,8 +191,31 @@ def run(
     )
 
     # Stage 5: Financial model
+    from .stage5_model.aggregator import aggregate_revenue
+    from .stage5_model.velocity import compute_filing_velocity
+    from .stage5_model.cycle_compare import compare_cycles
+    from .stage5_model.coverage import compute_coverage
+    from .stage5_model.excel_writer import generate_workbook
+
     console.print("\n[cyan]Stage 5:[/cyan] Building financial model...")
-    console.print("  [yellow]Stage 5 model not yet implemented.[/yellow]")
+    op_filter = operators[0] if len(operators) == 1 else None
+    agg = aggregate_revenue(db=db, operator=op_filter, year=year)
+    velocity_data = compute_filing_velocity(db=db, operator=op_filter, year=year)
+    cycle_data = compare_cycles(db=db, operator=op_filter, cycles=[2022, 2024, 2026])
+    cov = compute_coverage(db=db, operator=op_filter, year=year)
+    raw_data = db.get_extractions_for_model(operator=op_filter, year=year)
+
+    workbook_path = generate_workbook(
+        operator_summary=agg["by_operator_quarter"],
+        dma_detail=agg["by_dma"],
+        velocity_data=velocity_data,
+        cycle_comparison=cycle_data,
+        raw_data=raw_data,
+        coverage_stats=cov,
+        operators=operators,
+        year=year,
+    )
+    console.print(f"  [green]✓[/green] Workbook: {workbook_path}")
 
     console.print("\n[bold green]Pipeline complete.[/bold green]")
     _print_status(db)
@@ -405,8 +428,52 @@ def model(
         f"\n[bold]Building financial model for {', '.join(operators)}"
         + (f" — {year}" if year else "") + "[/bold]"
     )
-    console.print("[yellow]Stage 5 model not yet implemented.[/yellow]")
-    console.print("[dim]Run the full pipeline first with 'fcc-tracker run'.[/dim]")
+
+    from .stage5_model.aggregator import aggregate_revenue
+    from .stage5_model.velocity import compute_filing_velocity
+    from .stage5_model.cycle_compare import compare_cycles
+    from .stage5_model.coverage import compute_coverage
+    from .stage5_model.excel_writer import generate_workbook
+
+    op_filter = operators[0] if len(operators) == 1 else None
+
+    console.print("[cyan]Computing revenue aggregations...[/cyan]")
+    agg = aggregate_revenue(db=db, operator=op_filter, year=year)
+
+    console.print("[cyan]Computing filing velocity...[/cyan]")
+    velocity = compute_filing_velocity(db=db, operator=op_filter, year=year)
+
+    console.print("[cyan]Computing cycle comparison...[/cyan]")
+    cycle_data = compare_cycles(db=db, operator=op_filter, cycles=[2022, 2024, 2026])
+
+    console.print("[cyan]Computing coverage metrics...[/cyan]")
+    coverage = compute_coverage(db=db, operator=op_filter, year=year)
+
+    # Fetch raw data for audit trail tab
+    raw_data = db.get_extractions_for_model(operator=op_filter, year=year)
+
+    console.print("[cyan]Writing Excel workbook...[/cyan]")
+    workbook_path = generate_workbook(
+        operator_summary=agg["by_operator_quarter"],
+        dma_detail=agg["by_dma"],
+        velocity_data=velocity,
+        cycle_comparison=cycle_data,
+        raw_data=raw_data,
+        coverage_stats=coverage,
+        output_path=output_file,
+        operators=operators,
+        year=year,
+    )
+
+    console.print(f"\n[bold green]Model complete:[/bold green]")
+    console.print(f"  Workbook: {workbook_path}")
+    console.print(f"  Operator rows:  {len(agg['by_operator_quarter'])}")
+    console.print(f"  DMA rows:       {len(agg['by_dma'])}")
+    console.print(f"  Velocity weeks: {len(velocity)}")
+    console.print(f"  Extractions:    {len(raw_data)}")
+    if coverage:
+        total_cov = sum(c.coverage_rate for c in coverage) / len(coverage)
+        console.print(f"  Avg coverage:   {total_cov:.1%}")
 
 
 @app.command()
