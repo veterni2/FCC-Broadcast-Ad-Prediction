@@ -59,6 +59,12 @@ def load_operator_stations(
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            # Skip comment rows (callsign starts with '#') — used for
+            # human-readable section headers inside the CSV
+            callsign_raw = row.get("callsign", "").strip()
+            if callsign_raw.startswith("#"):
+                continue
+
             # Apply operator filter
             if operator_filter:
                 op_name = row.get("operator_name", "").lower()
@@ -106,7 +112,10 @@ def get_operators(csv_path: Optional[Path] = None) -> list[str]:
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            op = row.get("operator_name", "").strip()
+            if (row.get("callsign") or "").strip().startswith("#"):
+                continue
+            op = row.get("operator_name", "") or ""
+            op = op.strip()
             if op:
                 operators.add(op)
 

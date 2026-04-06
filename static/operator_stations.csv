@@ -1,4 +1,8 @@
 callsign,facility_id,entity_id,operator_name,dma_rank,dma_name,dma_code,community_state,network_affil
+# ---------------------------------------------------------------------------
+# GRAY TELEVISION  (51 original + 13 added: Raycom 2019 + Meredith 2021)
+# Data vintage: 2024-2025 season.  Ownership as of Jan 1 2025.
+# ---------------------------------------------------------------------------
 WBAY,22098,,Gray Television,69,Green Bay-Appleton,658,WI,ABC
 WCTV,12439,,Gray Television,108,Tallahassee-Thomasville,530,FL,CBS
 WEAU,22124,,Gray Television,128,La Crosse-Eau Claire,702,WI,NBC
@@ -49,3 +53,180 @@ KXJB,22091,,Gray Television,120,Fargo-Valley City,724,ND,CBS
 WILX,73172,,Gray Television,48,Lansing,551,MI,NBC
 WJTV,21912,,Gray Television,93,Jackson MS,718,MS,CBS
 KAKE,22093,,Gray Television,68,Wichita-Hutchinson Plus,678,KS,ABC
+# Gray — Raycom Media acquisition (2019)
+WBTV,,,Gray Television,21,Charlotte,517,NC,CBS
+WSPA,,,Gray Television,36,Greenville-Spartanburg-Asheville,567,SC,CBS
+WWL,,,Gray Television,50,New Orleans,622,LA,CBS
+WKRG,,,Gray Television,57,Mobile-Pensacola-Fort Walton Beach,686,AL,CBS
+WVTM,,,Gray Television,45,Birmingham-Anniston-Tuscaloosa,630,AL,NBC
+# Gray — Meredith Local Media acquisition (2021)
+WBRC,,,Gray Television,45,Birmingham-Anniston-Tuscaloosa,630,AL,FOX
+WHNS,,,Gray Television,36,Greenville-Spartanburg-Asheville,567,SC,FOX
+KCTV,,,Gray Television,33,Kansas City,616,MO,CBS
+KSAT,,,Gray Television,31,San Antonio,641,TX,ABC
+KVVU,,,Gray Television,40,Las Vegas,839,NV,FOX
+KPHO,,,Gray Television,12,Phoenix-Prescott,753,AZ,CBS
+KTVK,,,Gray Television,12,Phoenix-Prescott,753,AZ,IND
+WFSB,,,Gray Television,32,Hartford-New Haven,533,CT,CBS
+# ---------------------------------------------------------------------------
+# NEXSTAR MEDIA GROUP  (stations owned pre-Tegna acquisition, i.e. through
+# March 18 2026; post-acquisition Nexstar also owns all former Tegna stations
+# listed separately below under "Tegna Inc." for historical 2024-cycle research)
+# Sources: Tribune Media acq. 2019; LIN/Media General acq. 2017; organic.
+# ---------------------------------------------------------------------------
+# Nexstar — former Tribune Media stations
+WPIX,,,Nexstar Media Group,1,New York,501,NY,CW
+KTLA,,,Nexstar Media Group,2,Los Angeles,803,CA,CW
+WGN-TV,,,Nexstar Media Group,3,Chicago,602,IL,IND
+KDAF,,,Nexstar Media Group,5,Dallas-Fort Worth,623,TX,CW
+WPHL,,,Nexstar Media Group,4,Philadelphia,504,PA,MNT
+KIAH,,,Nexstar Media Group,7,Houston,618,TX,CW
+WDCW,,,Nexstar Media Group,8,Washington-Hagerstown,511,DC,CW
+WSFL,,,Nexstar Media Group,16,Miami-Fort Lauderdale,528,FL,CW
+KDVR,,,Nexstar Media Group,17,Denver,751,CO,FOX
+KWGN,,,Nexstar Media Group,17,Denver,751,CO,CW
+KTXL,,,Nexstar Media Group,20,Sacramento-Stockton-Modesto,862,CA,FOX
+WJW,,,Nexstar Media Group,19,Cleveland-Akron-Canton,510,OH,FOX
+WJZY,,,Nexstar Media Group,21,Charlotte,517,NC,FOX
+WNCN,,,Nexstar Media Group,22,Raleigh-Durham-Fayetteville,560,NC,CBS
+KTVI,,,Nexstar Media Group,24,Saint Louis,609,MO,FOX
+KPLR,,,Nexstar Media Group,24,Saint Louis,609,MO,CW
+WXIN,,,Nexstar Media Group,25,Indianapolis,527,IN,FOX
+WTTV,,,Nexstar Media Group,25,Indianapolis,527,IN,CBS
+WTIC,,,Nexstar Media Group,32,Hartford-New Haven,533,CT,FOX
+WTNH,,,Nexstar Media Group,32,Hartford-New Haven,533,CT,ABC
+WGNO,,,Nexstar Media Group,50,New Orleans,622,LA,ABC
+WREG,,,Nexstar Media Group,51,Memphis,640,TN,CBS
+WIVB,,,Nexstar Media Group,54,Buffalo,514,NY,CBS
+# Nexstar — LIN Media → Media General → Nexstar
+KRON,,,Nexstar Media Group,6,San Francisco-Oakland-San Jose,807,CA,IND
+WFLA,,,Nexstar Media Group,11,Tampa-St. Petersburg-Sarasota,539,FL,NBC
+KXAN,,,Nexstar Media Group,34,Austin,635,TX,NBC
+KNVA,,,Nexstar Media Group,34,Austin,635,TX,CW
+WOOD,,,Nexstar Media Group,43,Grand Rapids-Kalamazoo-Battle Creek,563,MI,NBC
+WZZM,,,Nexstar Media Group,43,Grand Rapids-Kalamazoo-Battle Creek,563,MI,ABC
+WAVY,,,Nexstar Media Group,44,Norfolk-Portsmouth-Newport News,544,VA,NBC
+# Nexstar — Young Broadcasting and other organic acquisitions
+WKRN,,,Nexstar Media Group,27,Nashville,659,TN,ABC
+WRIC,,,Nexstar Media Group,56,Richmond-Petersburg,556,VA,ABC
+WBRE,,,Nexstar Media Group,59,Wilkes Barre-Scranton-Hazleton,577,PA,NBC
+WYOU,,,Nexstar Media Group,59,Wilkes Barre-Scranton-Hazleton,577,PA,CBS
+WDAF,,,Nexstar Media Group,33,Kansas City,616,MO,FOX
+WCMH,,,Nexstar Media Group,35,Columbus,535,OH,NBC
+KLAS,,,Nexstar Media Group,40,Las Vegas,839,NV,CBS
+WPRI,,,Nexstar Media Group,52,Providence-New Bedford,521,RI,CBS
+WNAC,,,Nexstar Media Group,52,Providence-New Bedford,521,RI,FOX
+KSEE,,,Nexstar Media Group,55,Fresno-Visalia,866,CA,NBC
+KGPE,,,Nexstar Media Group,55,Fresno-Visalia,866,CA,CBS
+KARK,,,Nexstar Media Group,58,Little Rock-Pine Bluff,693,AR,NBC
+KRQE,,,Nexstar Media Group,48,Albuquerque-Santa Fe,,NM,CBS
+WHO,,,Nexstar Media Group,67,Des Moines-Ames,679,IA,NBC
+# ---------------------------------------------------------------------------
+# TEGNA INC.  (pre-acquisition roster — stations effective through March 18 2026)
+# TEGNA Inc. was acquired by Nexstar Media Group on March 19 2026 for $6.2B.
+# As of that date all stations below are owned by Nexstar Media Group Inc.
+# Retain "Tegna Inc." as operator_name to preserve 2024-cycle attribution.
+# Source: tegna.com/tv-stations; Wikipedia List of Tegna stations.
+# ---------------------------------------------------------------------------
+WFAA,,,Tegna Inc.,5,Dallas-Fort Worth,623,TX,ABC
+KHOU,,,Tegna Inc.,7,Houston,618,TX,CBS
+WXIA,,,Tegna Inc.,9,Atlanta,524,GA,NBC
+WUSA,,,Tegna Inc.,8,Washington-Hagerstown,511,DC,CBS
+KPNX,,,Tegna Inc.,12,Phoenix-Prescott,753,AZ,NBC
+KING,,,Tegna Inc.,13,Seattle-Tacoma,819,WA,NBC
+KONG,,,Tegna Inc.,13,Seattle-Tacoma,819,WA,IND
+KARE,,,Tegna Inc.,15,Minneapolis-Saint Paul,613,MN,NBC
+KUSA,,,Tegna Inc.,17,Denver,751,CO,NBC
+WKYC,,,Tegna Inc.,19,Cleveland-Akron-Canton,510,OH,NBC
+KXTV,,,Tegna Inc.,20,Sacramento-Stockton-Modesto,862,CA,ABC
+WCNC,,,Tegna Inc.,21,Charlotte,517,NC,NBC
+KGW,,,Tegna Inc.,23,Portland OR,820,OR,NBC
+KSDK,,,Tegna Inc.,24,Saint Louis,609,MO,NBC
+WTHR,,,Tegna Inc.,25,Indianapolis,527,IN,NBC
+KTVX,,,Tegna Inc.,28,Salt Lake City,770,UT,ABC
+KUCW,,,Tegna Inc.,28,Salt Lake City,770,UT,CW
+WTSP,,,Tegna Inc.,11,Tampa-St. Petersburg-Sarasota,539,FL,CBS
+KFMB,,,Tegna Inc.,30,San Diego,825,CA,CBS
+KENS,,,Tegna Inc.,31,San Antonio,641,TX,CBS
+KVUE,,,Tegna Inc.,34,Austin,635,TX,ABC
+WFMY,,,Tegna Inc.,46,Greensboro-High Point-Winston Salem,518,NC,CBS
+WTLV,,,Tegna Inc.,41,Jacksonville,561,FL,NBC
+WJXX,,,Tegna Inc.,41,Jacksonville,561,FL,ABC
+WGRZ,,,Tegna Inc.,54,Buffalo,514,NY,NBC
+KREM,,,Tegna Inc.,66,Spokane,881,WA,CBS
+WLTX,,,Tegna Inc.,76,Columbia SC,546,SC,CBS
+# ---------------------------------------------------------------------------
+# E.W. SCRIPPS COMPANY  (2024-2025 roster)
+# Includes stations acquired from Meredith Local Media sold to Scripps (2021):
+#   WEWS (Cleveland), WXYZ/WMYD (Detroit), WCPO (Cincinnati), WMAR (Baltimore)
+# Sources: scripps.com/brands/local-media; Wikipedia.
+# ---------------------------------------------------------------------------
+KNXV,,,The E.W. Scripps Company,12,Phoenix-Prescott,753,AZ,ABC
+KMGH,,,The E.W. Scripps Company,17,Denver,751,CO,ABC
+WXYZ,,,The E.W. Scripps Company,14,Detroit,505,MI,ABC
+WMYD,,,The E.W. Scripps Company,14,Detroit,505,MI,IND
+WFTS,,,The E.W. Scripps Company,11,Tampa-St. Petersburg-Sarasota,539,FL,ABC
+KGTV,,,The E.W. Scripps Company,30,San Diego,825,CA,ABC
+WEWS,,,The E.W. Scripps Company,19,Cleveland-Akron-Canton,510,OH,ABC
+WCPO,,,The E.W. Scripps Company,37,Cincinnati,515,OH,ABC
+WMAR,,,The E.W. Scripps Company,26,Baltimore,512,MD,ABC
+KSHB,,,The E.W. Scripps Company,33,Kansas City,616,MO,NBC
+WTVF,,,The E.W. Scripps Company,27,Nashville,659,TN,CBS
+WTMJ,,,The E.W. Scripps Company,38,Milwaukee,617,WI,NBC
+WPTV,,,The E.W. Scripps Company,39,West Palm Beach-Fort Pierce,548,FL,NBC
+KTNV,,,The E.W. Scripps Company,40,Las Vegas,839,NV,ABC
+WTKR,,,The E.W. Scripps Company,44,Norfolk-Portsmouth-Newport News,544,VA,CBS
+WTVR,,,The E.W. Scripps Company,56,Richmond-Petersburg,556,VA,CBS
+KJRH,,,The E.W. Scripps Company,61,Tulsa,671,OK,NBC
+WKBW,,,The E.W. Scripps Company,54,Buffalo,514,NY,ABC
+WLEX,,,The E.W. Scripps Company,63,Lexington,541,KY,NBC
+KGUN,,,The E.W. Scripps Company,65,Tucson-Sierra Vista,789,AZ,ABC
+KMTV,,,The E.W. Scripps Company,73,Omaha,652,NE,CBS
+WGBA,,,The E.W. Scripps Company,69,Green Bay-Appleton,658,WI,NBC
+# ---------------------------------------------------------------------------
+# SINCLAIR BROADCAST GROUP  (subsidiary of Sinclair Inc., 2024-2025 roster)
+# "Roar" (in-house Sinclair multicast network) listed as network_affil where
+# it is the primary affiliation.  Sinclair divested WVTV/WICS/WICD/KHQA
+# to Rincon Broadcasting in early 2025 — those stations excluded.
+# Sources: sbgi.net/tv-stations; Wikipedia List of Sinclair stations.
+# ---------------------------------------------------------------------------
+WJLA,,,Sinclair Broadcast Group,8,Washington-Hagerstown,511,DC,ABC
+WBFF,,,Sinclair Broadcast Group,26,Baltimore,512,MD,FOX
+WNUV,,,Sinclair Broadcast Group,26,Baltimore,512,MD,CW
+KATU,,,Sinclair Broadcast Group,23,Portland OR,820,OR,ABC
+KDNL,,,Sinclair Broadcast Group,24,Saint Louis,609,MO,ABC
+WKRC,,,Sinclair Broadcast Group,37,Cincinnati,515,OH,CBS
+WSYX,,,Sinclair Broadcast Group,35,Columbus,535,OH,ABC
+WTTE,,,Sinclair Broadcast Group,35,Columbus,535,OH,FOX
+WKEF,,,Sinclair Broadcast Group,64,Dayton,542,OH,ABC
+KOKH,,,Sinclair Broadcast Group,47,Oklahoma City,650,OK,FOX
+KOCB,,,Sinclair Broadcast Group,47,Oklahoma City,650,OK,IND
+KTUL,,,Sinclair Broadcast Group,61,Tulsa,671,OK,ABC
+KDSM,,,Sinclair Broadcast Group,67,Des Moines-Ames,679,IA,FOX
+WLOS,,,Sinclair Broadcast Group,36,Greenville-Spartanburg-Asheville,567,SC,ABC
+WMYA,,,Sinclair Broadcast Group,36,Greenville-Spartanburg-Asheville,567,SC,IND
+WPGH,,,Sinclair Broadcast Group,23,Pittsburgh,508,PA,FOX
+WPNT,,,Sinclair Broadcast Group,23,Pittsburgh,508,PA,CW
+WLFL,,,Sinclair Broadcast Group,22,Raleigh-Durham-Fayetteville,560,NC,CW
+WRDC,,,Sinclair Broadcast Group,22,Raleigh-Durham-Fayetteville,560,NC,MNT
+WXLV,,,Sinclair Broadcast Group,46,Greensboro-High Point-Winston Salem,518,NC,ABC
+WPEC,,,Sinclair Broadcast Group,39,West Palm Beach-Fort Pierce,548,FL,CBS
+WRGB,,,Sinclair Broadcast Group,62,Albany-Schenectady-Troy,532,NY,CBS
+WCWN,,,Sinclair Broadcast Group,62,Albany-Schenectady-Troy,532,NY,CW
+WHAM,,,Sinclair Broadcast Group,79,Rochester,538,NY,ABC
+WUHF,,,Sinclair Broadcast Group,79,Rochester,538,NY,FOX
+WSTM,,,Sinclair Broadcast Group,88,Syracuse,555,NY,NBC
+WSET,,,Sinclair Broadcast Group,70,Roanoke-Lynchburg,573,VA,ABC
+WZTV,,,Sinclair Broadcast Group,27,Nashville,659,TN,FOX
+WOAI,,,Sinclair Broadcast Group,31,San Antonio,641,TX,NBC
+KABB,,,Sinclair Broadcast Group,31,San Antonio,641,TX,FOX
+KEYE,,,Sinclair Broadcast Group,34,Austin,635,TX,CBS
+KATV,,,Sinclair Broadcast Group,58,Little Rock-Pine Bluff,693,AR,ABC
+WCHS,,,Sinclair Broadcast Group,82,Charleston-Huntington,564,WV,ABC
+WLUK,,,Sinclair Broadcast Group,69,Green Bay-Appleton,658,WI,FOX
+WEAR,,,Sinclair Broadcast Group,57,Mobile-Pensacola-Fort Walton Beach,686,FL,ABC
+KUTV,,,Sinclair Broadcast Group,28,Salt Lake City,770,UT,CBS
+KMPH,,,Sinclair Broadcast Group,55,Fresno-Visalia,866,CA,FOX
+KFRE,,,Sinclair Broadcast Group,55,Fresno-Visalia,866,CA,CW
+WTVC,,,Sinclair Broadcast Group,86,Chattanooga,575,TN,ABC
+KBOI,,,Sinclair Broadcast Group,98,Boise,757,ID,CBS
