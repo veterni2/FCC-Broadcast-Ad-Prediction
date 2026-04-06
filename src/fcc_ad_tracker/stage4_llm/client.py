@@ -58,11 +58,20 @@ class LLMClient:
         # Precompute tool schema once from the Pydantic model
         self._tool_schema = _build_tool_schema(PoliticalAdExtraction)
 
-    def extract(self, document_text: str) -> tuple[PoliticalAdExtraction, dict]:
+    def extract(
+        self,
+        document_text: str,
+        document_type_hint: Optional[str] = None,
+    ) -> tuple[PoliticalAdExtraction, dict]:
         """Extract structured data from a political ad document.
 
         Args:
             document_text: Raw text from the PDF (OCR or direct extraction).
+            document_type_hint: Document type derived from the FCC folder URL
+                path ('INVOICE' or 'CONTRACT'). When provided it is prepended
+                to the user message as a strong prior — Claude may override it
+                if the document content clearly contradicts the path-derived
+                classification.
 
         Returns:
             Tuple of (PoliticalAdExtraction result, usage_stats dict).
@@ -75,6 +84,20 @@ class LLMClient:
                 f"Document text truncated from {len(document_text)} to {max_chars} chars"
             )
             document_text = document_text[:max_chars]
+
+        # Prepend path-derived document type as a strong prior.
+        # The folder path in the FCC filing hierarchy is more reliable than
+        # inferring type from document content, so we surface it explicitly.
+        if document_type_hint:
+            user_content = (
+                f"[CONTEXT: The FCC filing folder path for this document "
+                f"indicates document_type={document_type_hint}. "
+                f"Use this as a strong prior when classifying the document, "
+                f"but override if the document content clearly contradicts it.]\n\n"
+                f"{document_text}"
+            )
+        else:
+            user_content = document_text
 
         tool_spec = {
             "name": "extract_political_ad_data",
@@ -93,7 +116,7 @@ class LLMClient:
             system=EXTRACTION_SYSTEM_PROMPT,
             tools=[tool_spec],
             tool_choice={"type": "tool", "name": "extract_political_ad_data"},
-            messages=[{"role": "user", "content": document_text}],
+            messages=[{"role": "user", "content": user_content}],
         )
 
         # tool_choice forces a tool_use block; stop_reason will be "tool_use"

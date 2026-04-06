@@ -84,7 +84,10 @@ async def run_llm_extraction(
                 continue
 
             try:
-                result, usage = client.extract(raw_text)
+                # Pass path-derived document type as a strong prior; None
+                # when the URL path didn't encode an explicit type.
+                doc_type_hint: str | None = doc.get("document_type")
+                result, usage = client.extract(raw_text, document_type_hint=doc_type_hint)
 
                 # Determine revenue quarter using the three-tier hierarchy
                 quarter, date_source, date_unknown = attribute_revenue_quarter(
