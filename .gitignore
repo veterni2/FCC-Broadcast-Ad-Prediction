@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+
+# Runtime data (downloaded/generated)
+data/lms/*.txt
+data/lms/*.zip
+data/lms/*.dat
+data/stations.json
+data/race_ratings.csv
+data/documents.db
+data/documents.db-wal
+data/documents.db-shm
+data/pdfs/**/*.pdf
+
+# Output
+output/*.xlsx
+output/*.csv
+output/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/

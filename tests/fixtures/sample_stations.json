@@ -1,0 +1,24 @@
+[
+  {
+    "callsign": "WFAA",
+    "facility_id": "72054",
+    "entity_id": "E12345",
+    "operator_name": "Gray Television",
+    "dma_rank": 5,
+    "dma_name": "Dallas-Fort Worth",
+    "dma_code": "623",
+    "community_state": "TX",
+    "network_affil": "ABC"
+  },
+  {
+    "callsign": "KHOU",
+    "facility_id": "72055",
+    "entity_id": "E12346",
+    "operator_name": "Gray Television",
+    "dma_rank": 8,
+    "dma_name": "Houston",
+    "dma_code": "618",
+    "community_state": "TX",
+    "network_affil": "CBS"
+  }
+]

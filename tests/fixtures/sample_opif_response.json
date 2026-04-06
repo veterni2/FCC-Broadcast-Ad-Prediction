@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "file_id": "abc123",
+      "file_name": "Invoice_Oct2024.pdf",
+      "file_extension": "pdf",
+      "file_size": 125000,
+      "folder_id": "folder001",
+      "file_manager_id": "fm001",
+      "callsign": "WFAA",
+      "entity_id": "72054",
+      "source_service_code": "TV",
+      "network_affiliation": "ABC",
+      "create_ts": "2024-10-15T14:30:00Z",
+      "last_update_ts": "2024-10-15T14:30:00Z",
+      "political_file_type": "PA",
+      "campaign_year": "2024"
+    }
+  ],
+  "total": 1,
+  "page": 0,
+  "size": 100
+}
