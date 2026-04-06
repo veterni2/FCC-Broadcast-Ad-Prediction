@@ -54,6 +54,7 @@ def ocr_image(
 
 def ocr_pdf_pages(
     pdf_path: Path,
+    engine: Optional[str] = None,
     dpi: Optional[int] = None,
 ) -> tuple[str, int, float]:
     """OCR all pages of a PDF by converting to images first.
@@ -63,6 +64,8 @@ def ocr_pdf_pages(
 
     Args:
         pdf_path: Path to the PDF file.
+        engine: OCR engine to use ('paddleocr' or 'tesseract').
+            Defaults to settings value.
         dpi: Resolution for rendering. Defaults to settings value (300).
 
     Returns:
@@ -97,7 +100,7 @@ def ocr_pdf_pages(
         img = preprocess_image(img)
 
         # Run OCR
-        text, confidence = ocr_image(img)
+        text, confidence = ocr_image(img, engine=engine)
         pages_text.append(text)
         confidences.append(confidence)
 

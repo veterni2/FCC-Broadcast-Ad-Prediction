@@ -106,7 +106,7 @@ async def run_pdf_pipeline(
 
                 preferred_engine = settings.pdf.ocr_engine
                 log.debug(f"Running {preferred_engine} OCR on {doc_uuid}")
-                ocr_text, confidence = ocr_pdf_pages(pdf_path, engine=preferred_engine)
+                ocr_text, _ocr_page_count, confidence = ocr_pdf_pages(pdf_path, engine=preferred_engine)
                 method = preferred_engine
                 ocr_success = True
 
@@ -127,7 +127,7 @@ async def run_pdf_pipeline(
                     from .ocr import ocr_pdf_pages  # noqa: PLC0415
 
                     log.debug(f"Running tesseract OCR on {doc_uuid}")
-                    ocr_text, confidence = ocr_pdf_pages(pdf_path, engine="tesseract")
+                    ocr_text, _ocr_page_count, confidence = ocr_pdf_pages(pdf_path, engine="tesseract")
                     method = "tesseract"
                     ocr_success = True
 
