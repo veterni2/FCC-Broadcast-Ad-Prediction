@@ -53,12 +53,77 @@ def preprocess_image(
     if denoise:
         image = image.filter(ImageFilter.MedianFilter(size=3))
 
-    # 4. Deskew (simplified — full deskew requires numpy/scipy)
-    # For now, just log that deskew was requested
+    # 4. Deskew correction using horizontal projection profiles
     if deskew:
-        log.debug("Deskew requested but advanced deskew not yet implemented")
+        image = _deskew(image)
 
     return image
+
+
+def _deskew(image: Image.Image) -> Image.Image:
+    """Detect and correct document skew using horizontal projection profiles.
+
+    Rotates the binarized image through a coarse then fine angle search.
+    The angle whose rotation maximises the variance of the horizontal
+    projection (row sums of text pixels) is used for correction — sharp
+    text lines produce high-variance projections when the image is upright.
+
+    Angle search is performed on a downsampled copy (≤400 px wide) for
+    speed; the correction is applied to the full-resolution image.
+
+    Falls back silently to the original image when:
+      - numpy is not installed (ocr extras not present)
+      - the detected skew is < 0.2° (within rounding noise)
+      - the image has too few text pixels to estimate reliably
+
+    Args:
+        image: Binarized L-mode PIL Image (0 = black/text, 255 = white/bg).
+
+    Returns:
+        Deskewed PIL Image, or the original if deskew could not be applied.
+    """
+    try:
+        import numpy as np
+    except ImportError:
+        log.debug("numpy not available; deskew skipped")
+        return image
+
+    # Downsample to ≤400 px wide for fast angle search
+    scale = min(1.0, 400.0 / max(image.width, 1))
+    small = image.resize(
+        (max(1, int(image.width * scale)), max(1, int(image.height * scale))),
+        Image.Resampling.LANCZOS,
+    )
+
+    def _score(img: Image.Image, angle: float) -> float:
+        rotated = img.rotate(angle, expand=False, fillcolor=255)
+        arr = np.asarray(rotated, dtype=np.float32)
+        # Invert so text pixels are positive; sum per row
+        projection = (255.0 - arr).sum(axis=1)
+        return float(np.var(projection))
+
+    # Coarse search: −10° … +10° in 1° steps
+    best_angle = 0.0
+    best_score = _score(small, 0.0)
+    for angle in np.arange(-10.0, 10.1, 1.0):
+        s = _score(small, float(angle))
+        if s > best_score:
+            best_score = s
+            best_angle = float(angle)
+
+    # Fine search: ±1° around the coarse winner in 0.2° steps
+    for angle in np.arange(best_angle - 1.0, best_angle + 1.01, 0.2):
+        s = _score(small, float(angle))
+        if s > best_score:
+            best_score = s
+            best_angle = float(angle)
+
+    if abs(best_angle) < 0.2:
+        log.debug("No significant skew detected (best angle < 0.2°)")
+        return image
+
+    log.info(f"Deskewing image by {best_angle:.1f}°")
+    return image.rotate(best_angle, expand=True, fillcolor=255)
 
 
 def _otsu_threshold(histogram: list[int], total_pixels: int) -> int:
